@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.components import render_chart_placeholder
 
-def render_overview(selected_years, selected_region, selected_metric):
+def render_overview(df, selected_years, selected_region, selected_metric):
     st.header("Overview Dashboard")
     st.markdown("Identify which provinces have been most impacted and where severity is concentrated.", help="Data is filtered by the Configuration sidebar.")
     st.write("") # spacer

@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.components import render_chart_placeholder
 
-def render_priority_planner(selected_years, selected_region):
+def render_priority_planner(df, selected_years, selected_region):
     st.header("🚨 Priority Planner")
     st.markdown("Simulate budget allocation and determine priority provinces for infrastructure investment and disaster recovery.")
     st.write("") # spacer

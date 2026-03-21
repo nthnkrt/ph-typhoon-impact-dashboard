@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.components import render_chart_placeholder
 
-def render_deep_dive(selected_years, selected_region):
+def render_deep_dive(df, selected_years, selected_region):
     st.header("Province Deep Dive")
     st.markdown("Explore the complete impact history and primary types of damage for a specific province.")
     st.write("")

@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.components import render_chart_placeholder
 
-def render_trend_analyzer(selected_years, selected_region):
+def render_trend_analyzer(df, selected_years, selected_region):
     st.header("📈 Trend Analyzer")
     st.markdown("Assess if typhoon impacts are intensifying and compare damage trajectories across regions.")
     st.write("") # spacer
