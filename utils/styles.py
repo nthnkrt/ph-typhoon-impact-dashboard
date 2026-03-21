@@ -8,36 +8,36 @@ def apply_custom_css():
         
         html, body, [class*="css"]  {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: #E2E8F0; /* Tailwind slate-200 */
         }
 
-        /* Metric styling for premium look */
+        /* Metric styling for premium look (Theme Agnostic) */
         div[data-testid="stMetric"] {
-            background-color: #1E293B; /* Tailwind slate-800 */
+            background-color: rgba(128, 128, 128, 0.04);
             border-radius: 8px;
             padding: 16px 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 1px solid #334155; /* Tailwind slate-700 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(128, 128, 128, 0.15);
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
         
         div[data-testid="stMetric"]:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            border-color: #3B82F6; /* Tailwind blue-500 */
+            border-color: #3B82F6; /* Accent Blue */
         }
 
-        /* Value color */
+        /* Value size */
         div[data-testid="stMetricValue"] {
             font-size: 2.2rem;
             font-weight: 700;
-            color: #F8FAFC; /* Tailwind slate-50 */
         }
 
+        /* Subdued Labels */
         div[data-testid="stMetricLabel"] {
             font-size: 0.9rem;
             font-weight: 500;
-            color: #94A3B8; /* Tailwind slate-400 */
+            color: inherit;
+            opacity: 0.65;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -46,7 +46,7 @@ def apply_custom_css():
         .stTabs [data-baseweb="tab-list"] {
             gap: 16px;
             padding: 8px 0;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.15);
         }
 
         .stTabs [data-baseweb="tab"] {
@@ -56,28 +56,35 @@ def apply_custom_css():
             padding-top: 10px;
             padding-bottom: 10px;
             font-weight: 500;
-            color: #94A3B8;
-            transition: color 0.15s ease, background-color 0.15s ease;
+            color: inherit;
+            opacity: 0.6;
+            transition: color 0.15s ease, background-color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .stTabs [data-baseweb="tab"]:hover {
+            opacity: 0.9;
         }
 
         .stTabs [aria-selected="true"] {
             background-color: transparent;
             color: #3B82F6 !important;
             border-bottom: 2px solid #3B82F6 !important;
+            opacity: 1;
         }
         
-        /* Placeholder styling class for charts */
+        /* Placeholder styling class for charts (Theme Agnostic) */
         .chart-placeholder {
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100%;
             width: 100%;
-            background-color: #0F172A; /* Tailwind slate-900 */
+            background-color: rgba(128, 128, 128, 0.03);
             border-radius: 8px;
-            border: 1px dashed #475569; /* Tailwind slate-600 */
+            border: 1px dashed rgba(128, 128, 128, 0.3);
             padding: 24px;
-            color: #64748B; /* Tailwind slate-500 */
+            color: inherit;
+            opacity: 0.7;
             font-size: 1.1rem;
             font-weight: 500;
             text-align: center;
@@ -86,7 +93,6 @@ def apply_custom_css():
         /* Expander headers */
         .streamlit-expanderHeader {
             font-weight: 600;
-            color: #E2E8F0;
         }
         
         /* General inputs and buttons styling overrides for a more cohesive look */
