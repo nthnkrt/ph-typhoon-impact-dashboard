@@ -23,11 +23,11 @@ def render_overview(df, selected_years, selected_region, selected_metric):
     col_map, col_chart = st.columns([3, 2], gap="large")
     
     with col_map:
-        st.subheader("🗺️ Geospatial Risk Mapping")
+        st.subheader("Geospatial Risk Mapping")
         st.caption("Choropleth map of the Philippines showing provinces colored by the selected metric.")
         render_chart_placeholder(height=500, text=f"Choropleth Map for {selected_metric}")
 
     with col_chart:
-        st.subheader(f"📊 Top 15 Provinces by {selected_metric}")
+        st.subheader(f"Top 15 Provinces by {selected_metric}")
         st.caption("Horizontal bar chart ranking the top 15 most impacted provinces.")
         render_chart_placeholder(height=500, text="Ranked Horizontal Bar Chart")

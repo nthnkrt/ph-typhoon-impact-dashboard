@@ -15,7 +15,7 @@ def render_deep_dive(df, selected_years, selected_region):
     st.markdown("<br>", unsafe_allow_html=True)
 
     # Province Profile Card (KPIs)
-    st.subheader("📌 Province Profile")
+    st.subheader("Province Profile")
     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
     with kpi1:
         st.metric("Total Incidents", "--")
@@ -33,7 +33,7 @@ def render_deep_dive(df, selected_years, selected_region):
     with col_line:
         col_title, col_metric = st.columns([2, 1])
         with col_title:
-            st.subheader("📈 Monthly Trend")
+            st.subheader("Monthly Trend")
         with col_metric:
             metric_choice = st.selectbox("Display Metric", ["TOTAL COST", "AFFECTED PERSONS", "DAMAGED HOUSES"], label_visibility="collapsed", key="dd_metric")
             
@@ -41,7 +41,7 @@ def render_deep_dive(df, selected_years, selected_region):
         render_chart_placeholder(height=400, text=f"{metric_choice} Time Series Plot")
 
     with col_pie:
-        st.subheader("🥧 Damage Breakdown")
+        st.subheader("Damage Breakdown")
         st.caption("Proportional breakdown of COST OF DAMAGE (Agri, Infra, Private, Housing).")
         st.write("") # Align with line chart dropdown space
         st.write("")
