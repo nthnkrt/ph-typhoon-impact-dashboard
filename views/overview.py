@@ -1,5 +1,7 @@
 import streamlit as st
 from utils.components import render_chart_placeholder
+from utils.components import render_choropleth_map
+from utils.components import render_top_provinces
 
 def render_overview(df, selected_years, selected_region, selected_metric):
     st.header("Overview Dashboard")
@@ -25,9 +27,10 @@ def render_overview(df, selected_years, selected_region, selected_metric):
     with col_map:
         st.subheader("Geospatial Risk Mapping")
         st.caption("Choropleth map of the Philippines showing provinces colored by the selected metric.")
-        render_chart_placeholder(height=500, text=f"Choropleth Map for {selected_metric}")
+        filtered_df = df[(df['year'] >= selected_years[0]) & (df['year'] <= selected_years[1])]
+        render_choropleth_map(filtered_df, selected_metric)
 
     with col_chart:
         st.subheader(f"Top 15 Provinces by {selected_metric}")
         st.caption("Horizontal bar chart ranking the top 15 most impacted provinces.")
-        render_chart_placeholder(height=500, text="Ranked Horizontal Bar Chart")
+        render_top_provinces(filtered_df, selected_metric)
