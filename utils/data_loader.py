@@ -20,8 +20,8 @@ def load_data() -> pd.DataFrame:
     
     # Returning an empty dataframe for the prototype structure
 
-    file_path = os.path.join("data", "cleaned_typhoon_data.csv")
+    file_path = "final_dashboard_data.csv"
     if os.path.exists(file_path):
-         return pd.read_csv(file_path)
+     return pd.read_csv(file_path, engine="python")
 
     return pd.DataFrame()

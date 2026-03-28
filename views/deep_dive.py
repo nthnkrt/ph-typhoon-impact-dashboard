@@ -17,17 +17,27 @@ def render_deep_dive(df, selected_years, selected_region):
 
     st.markdown("<br>", unsafe_allow_html=True)
 
+    # Calculate Province KPIs
+    if not df.empty and province_choice:
+        prov_df = df[(df['province'] == province_choice) & (df['year'] >= selected_years[0]) & (df['year'] <= selected_years[1])]
+        total_incidents = f"{len(prov_df):,}"
+        total_cost = f"₱{prov_df['cost_total'].sum():,.2f}"
+        total_affected = f"{int(prov_df['affected_persons'].sum()):,}"
+        total_casualties = f"{int(prov_df[['dead', 'injured/ill', 'missing']].sum().sum()):,}"
+    else:
+        total_incidents, total_cost, total_affected, total_casualties = "--", "--", "--", "--"
+
     # Province Profile Card (KPIs)
     st.subheader("Province Profile")
     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
     with kpi1:
-        st.metric("Total Incidents", "--")
+        st.metric("Total Incidents", total_incidents)
     with kpi2:
-        st.metric("Total Cost (₱)", "--")
+        st.metric("Total Cost (₱)", total_cost)
     with kpi3:
-        st.metric("Total Affected", "--")
+        st.metric("Total Affected", total_affected)
     with kpi4:
-        st.metric("Total Casualties", "--")
+        st.metric("Total Casualties", total_casualties)
     
     st.markdown("<br>", unsafe_allow_html=True)
 
