@@ -108,7 +108,11 @@ with st.sidebar:
 # Main Content Area
 # ==========================================
 st.title("Philippine Typhoon Socio-Economic Impact (2020–2024)")
-st.markdown("A decision support dashboard designed to optimize disaster recovery and budget allocation through evidence-based planning.")
+st.markdown("""
+**Stakeholder:** Department of Public Works and Highways (DPWH) & National Disaster Risk Reduction Management Councils (NDRRMC)  
+**Decision Question:** How should post-typhoon infrastructure rehabilitation and recovery budgets be prioritized and allocated across Philippine provinces to maximize socio-economic recovery?  
+**Decision Output:** 5-Tier Provincial Priority Ranking for Budget Allocation
+""")
 st.write("") # Spacer
 
 # Navigation
@@ -122,7 +126,7 @@ if 'nav_radio' not in st.session_state or st.session_state.nav_radio is None:
 # Use st.pills for a modern, minimalist, and clean navigation bar
 selected_tab = st.pills(
     "Navigation", 
-    ["Overview Dashboard", "Province Deep Dive", "Priority Planner", "Trend Analyzer"], 
+    ["Overview Dashboard", "Province Deep Dive", "Priority Planner", "Trend Analyzer", "Recommendations & Methodology"],
     selection_mode="single",
     label_visibility="collapsed",
     key="nav_radio"
@@ -146,3 +150,7 @@ elif selected_tab == "Priority Planner":
 elif selected_tab == "Trend Analyzer":
     from views import trend_analyzer
     trend_analyzer.render_trend_analyzer(df, selected_years, selected_region)
+
+elif selected_tab == "Recommendations & Methodology":
+    from views import recommendations
+    recommendations.render_recommendations(df, selected_years, selected_region)
