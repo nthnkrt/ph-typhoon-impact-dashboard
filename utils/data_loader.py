@@ -22,6 +22,9 @@ def load_data() -> pd.DataFrame:
 
     file_path = "final_dashboard_data.csv"
     if os.path.exists(file_path):
-     return pd.read_csv(file_path, engine="python")
+        df = pd.read_csv(file_path, engine="python")
+        if 'dmg_house_totally' in df.columns and 'dmg_house_partial' in df.columns:
+            df['damaged_houses'] = df['dmg_house_totally'] + df['dmg_house_partial']
+        return df
 
     return pd.DataFrame()

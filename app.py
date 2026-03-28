@@ -60,26 +60,30 @@ st.title("Philippine Typhoon Socio-Economic Impact (2020–2024)")
 st.markdown("A decision support dashboard designed to optimize disaster recovery and budget allocation through evidence-based planning.")
 st.write("") # Spacer
 
-# Navigation / Tabs
-tab1, tab2, tab3, tab4 = st.tabs([
-    "Overview Dashboard", 
-    "Province Deep Dive", 
-    "Priority Planner", 
-    "Trend Analyzer"
-])
+# Navigation
+if 'nav_radio' not in st.session_state:
+    st.session_state.nav_radio = "Overview Dashboard"
 
-with tab1:
+selected_tab = st.radio(
+    "Navigation", 
+    ["Overview Dashboard", "Province Deep Dive", "Priority Planner", "Trend Analyzer"], 
+    horizontal=True, 
+    label_visibility="collapsed",
+    key="nav_radio"
+)
+
+if selected_tab == "Overview Dashboard":
     from views import overview
     overview.render_overview(df, selected_years, selected_region, selected_metric)
 
-with tab2:
+elif selected_tab == "Province Deep Dive":
     from views import deep_dive
     deep_dive.render_deep_dive(df, selected_years, selected_region)
 
-with tab3:
+elif selected_tab == "Priority Planner":
     from views import priority_planner
     priority_planner.render_priority_planner(df, selected_years, selected_region)
 
-with tab4:
+elif selected_tab == "Trend Analyzer":
     from views import trend_analyzer
     trend_analyzer.render_trend_analyzer(df, selected_years, selected_region)

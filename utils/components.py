@@ -27,6 +27,12 @@ def render_chart_placeholder(height: int, text: str):
         # We use a markdown with custom class (requires custom css to be loaded)
         st.markdown(f'<div class="chart-placeholder" style="height: {height-40}px;">{text}</div>', unsafe_allow_html=True)
 
+@st.cache_data
+def load_map_polygons():
+    provinces = gpd.GeoDataFrame.from_file(os.path.join("data", "gadm41_PHL_shp", "gadm41_PHL_1.shp"))
+    provinces['geometry'] = provinces.geometry.simplify(tolerance=0.01, preserve_topology=True)
+    return provinces
+
 # TODO: Clean up dataset errors
 # TODO: Handle NCR
 # TODO: Define casualties
@@ -34,7 +40,7 @@ def render_choropleth_map(df, selected_metric):
     """
     Renders choropleth map
     """
-    provinces = gpd.GeoDataFrame.from_file(os.path.join("data", "gadm41_PHL_shp", "gadm41_PHL_1.shp"))
+    provinces = load_map_polygons()
     df = df.groupby(['province', 'region'], as_index=False).sum(numeric_only=True)
     # NOTE: I did not normalize to range 0 to 1 for now since min and max would be different
     # depending on year (and region) selection
@@ -87,7 +93,9 @@ def render_choropleth_map(df, selected_metric):
         )
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    # Allow click selection for navigation
+    event = st.plotly_chart(fig, use_container_width=True, on_select="rerun", selection_mode=("points",))
+    return event
 
 # TODO: CLean up dataset errors
 # TODO: Define casualties
