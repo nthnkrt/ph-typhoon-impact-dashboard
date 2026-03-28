@@ -2,11 +2,11 @@
 
 A decision support dashboard designed to optimize disaster recovery and budget allocation based on the "A Provincial Analysis of Typhoon Severity and Socio-Economic Impact in the Philippines (2020 to 2024)" study. 
 
-The dashboard provides actionable insights through the Composite Provincial Risk Score and Severity Factor.
+The dashboard provides actionable insights through the Composite Provincial Risk Score, Severity Factor, interactive variance modeling, and strict data engineering pipelines.
 
 ## Setup Instructions
 
-1. **Create a virtual environment (Optional but recommended):**
+1. **Create a virtual environment (Recommended):**
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
@@ -17,17 +17,25 @@ The dashboard provides actionable insights through the Composite Provincial Risk
    pip install -r requirements.txt
    ```
 
-3. **Run the Dashboard:**
+3. **Standardize Raw Data (Optional ETL pipeline run):**
+   If you download new raw Excel or tabular records, you can route them through the ETL scripts to ensure normalization format is maintained dynamically:
+   ```bash
+   python scripts/clean_data.py
+   python scripts/clean_dpwh_data.py
+   ```
+
+4. **Run the Dashboard:**
    ```bash
    streamlit run app.py
    ```
 
-## Project Structure
-* `app.py`: Main entrypoint containing global sidebar controls and top-level navigation.
-* `views/`: Contains the specific Python files to render the 4 main application views:
-  * `overview.py`: Geospatial Risk Mapping and High-level KPIs.
-  * `deep_dive.py`: Province specific analysis, monthly trends, and damage breakdowns.
-  * `priority_planner.py`: Budget simulation and actionable intervention checklists.
-  * `trend_analyzer.py`: Multi-year forecasting and inter-province benchmarking.
-* `data/`: Location for raw and processed datasets (CSV, GeoJSON).
-* `utils/`: Helper functions and data ingestion logic.
+## Project Architecture
+* `app.py`: Main entrypoint container executing global sidebar controls, configuration syncing, and top-level sub-view routing.
+* `views/`: The presentation logic rendering the 4 main application modules independently:
+  * `overview.py`: Geospatial Risk Mapping and High-level KPIs dynamically reacting to the sidebar queries.
+  * `deep_dive.py`: Province-specific granular analysis, monthly impact trends, and individual severity damage components.
+  * `priority_planner.py`: Mathematical budget simulation engine. Computes structural allocations ensuring zero-drift budgets, links composite tier categories natively, and supports `.PDF` / `.CSV` report generation exports.
+  * `trend_analyzer.py`: Multi-year variance forecasting mapping region standard deviations (Altair rendering) combined with 6-stage inter-province benchmarking.
+* `scripts/`: Offline Data Transformation utilities managing heavy Extract-Transform-Load (ETL) tasks without burdening Streamlit initialization (`clean_data.py`, `clean_dpwh_data.py`).
+* `data/`: Protected static storage location for flat-schema dependencies and outputs (`final_dashboard_data.csv`, `cleaned_dpwh_budget.csv`) alongside geographic configurations (`gadm41_PHL_shp`).
+* `utils/`: Core processing layers housing CSS templating and explicit mapping loaders caching memory states globally (`data_loader.py`, `styles.py`).
