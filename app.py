@@ -61,17 +61,25 @@ st.markdown("A decision support dashboard designed to optimize disaster recovery
 st.write("") # Spacer
 
 # Navigation
-if 'nav_radio' not in st.session_state:
+if 'nav_radio_target' in st.session_state:
+    st.session_state.nav_radio = st.session_state.nav_radio_target
+    del st.session_state.nav_radio_target
+
+if 'nav_radio' not in st.session_state or st.session_state.nav_radio is None:
     st.session_state.nav_radio = "Overview Dashboard"
 
-selected_tab = st.radio(
+# Use st.pills for a modern, minimalist, and clean navigation bar
+selected_tab = st.pills(
     "Navigation", 
     ["Overview Dashboard", "Province Deep Dive", "Priority Planner", "Trend Analyzer"], 
-    horizontal=True, 
+    selection_mode="single",
     label_visibility="collapsed",
     key="nav_radio"
 )
 
+if selected_tab is None:
+    selected_tab = "Overview Dashboard"
+    
 if selected_tab == "Overview Dashboard":
     from views import overview
     overview.render_overview(df, selected_years, selected_region, selected_metric)

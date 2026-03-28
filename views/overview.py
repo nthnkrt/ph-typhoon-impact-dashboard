@@ -47,7 +47,7 @@ def render_overview(df, selected_years, selected_region, selected_metric):
         if map_event and map_event.get("selection", {}).get("points"):
             selected_prov = map_event["selection"]["points"][0].get("location")
             if selected_prov and selected_prov in df['province'].values:
-                st.session_state.nav_radio = "Province Deep Dive"
+                st.session_state.nav_radio_target = "Province Deep Dive"
                 st.session_state.dd_province = selected_prov
                 st.rerun()
 

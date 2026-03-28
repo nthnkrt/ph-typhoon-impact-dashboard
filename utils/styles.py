@@ -102,5 +102,38 @@ def apply_custom_css():
             transition: all 0.2s ease;
         }
         
+        /* Modern minimalist pills for navigation */
+        [data-testid="stPills"] {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        [data-testid="stPills"] > div {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+        [data-testid="stPills"] button {
+            border-radius: 99px !important;
+            padding: 10px 24px !important;
+            font-weight: 600 !important;
+            font-size: 0.95rem !important;
+            letter-spacing: 0.02em;
+            border: 1px solid rgba(128, 128, 128, 0.15) !important;
+            background: rgba(128, 128, 128, 0.02) !important;
+            transition: all 0.2s ease !important;
+        }
+        [data-testid="stPills"] button:hover {
+            border-color: #3B82F6 !important;
+            background: rgba(59, 130, 246, 0.05) !important;
+            transform: translateY(-1px);
+        }
+        [data-testid="stPills"] button[data-selected="true"] {
+            background: #3B82F6 !important;
+            color: #ffffff !important;
+            border-color: #3B82F6 !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
+        }
+        
         </style>
     """, unsafe_allow_html=True)
