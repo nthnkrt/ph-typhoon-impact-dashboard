@@ -2,6 +2,7 @@ import streamlit as st
 from utils.styles import apply_custom_css
 from utils.data_loader import load_data, load_dpwh_data
 from utils.reports import generate_global_pdf_report
+import pandas as pd
 
 st.set_page_config(
     page_title="Typhoon Impact Dashboard (2020-2024)",
