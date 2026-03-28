@@ -38,3 +38,24 @@ def load_data() -> pd.DataFrame:
         return df
 
     return pd.DataFrame()
+
+@st.cache_data
+def load_dpwh_data() -> pd.DataFrame:
+    """
+    Loads the pre-cleaned DPWH Budget Allocation dataset.
+    """
+    file_path = "data/cleaned_dpwh_budget.csv"
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        
+        region_map = {
+            'NCR': 'NCR', 'CAR': 'CAR', 'REGION I': 'I', 'REGION II': 'II', 'REGION III': 'III',
+            'REGION IV-A': 'CALABARZON', 'REGION IV-B': 'MIMAROPA', 'REGION V': 'V',
+            'REGION VI': 'VI', 'REGION VII': 'VII', 'REGION VIII': 'VIII', 'REGION IX': 'IX',
+            'REGION X': 'X', 'REGION XI': 'XI', 'REGION XII': 'XII', 'REGION XIII': 'CARAGA',
+            'BARMM': 'BARMM'
+        }
+        df['Region'] = df['Region'].str.strip().str.upper().map(region_map).fillna(df['Region'])
+        
+        return df
+    return pd.DataFrame()
