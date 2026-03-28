@@ -10,12 +10,14 @@ import descartes
 import mapclassify
 import geoplot
 import plotly.express as px
+import plotly.graph_objects as go
 
 # NOTE: ...placed this to avoid unnecessary repetition across functions
 metric_mapping = {
     "Severity Factor": "severity",
     "Total Cost": "cost_total",
-    "Affected Families": "affected_families"
+    "Affected Families": "affected_families",
+    "Casualties": "casualties"
 }
 
 def render_chart_placeholder(height: int, text: str):
@@ -41,32 +43,63 @@ def render_choropleth_map(df, selected_metric):
     Renders choropleth map
     """
     provinces = load_map_polygons()
-    df = df.groupby(['province', 'region'], as_index=False).sum(numeric_only=True)
-    # NOTE: I did not normalize to range 0 to 1 for now since min and max would be different
-    # depending on year (and region) selection
-    # Setting absolute min and absolute max would change graph coloring (i.e., map for single year would be
-    # much "lighter" in color compared to 2020-2024 range map)
-    # NOTE: Add 1 to prevent division by zero error
-    df['severity'] = df['cost_total'] / (df['affected_families'] + 1)
     
+    df = df.groupby(['province', 'region'], as_index=False).sum(numeric_only=True)
+    df = df[~df['province'].isin(['without breakdown', 'Special Geographic Areas', 'IIII'])]
+    
+    # Severity Formula: Norm(Total cost of damage / Total affected families)
+    raw_severity = df['cost_total'] / (df['affected_families'] + 1)
+    if not raw_severity.empty and raw_severity.max() != raw_severity.min():
+        df['severity'] = (raw_severity - raw_severity.min()) / (raw_severity.max() - raw_severity.min())
+    else:
+        df['severity'] = 1.0 if not raw_severity.empty and raw_severity.max() > 0 else 0.0
+        
     merged_df = pd.merge(provinces, df, left_on='NAME_1', right_on='province', how='left')
     merged_df = merged_df.set_index('NAME_1')
 
     col = metric_mapping.get(selected_metric, "severity")
-    merged_df[col] = merged_df[col].fillna(0)
+    
+    # Explicitly bound the continuous color scale ranges
+    if selected_metric == "Severity Factor":
+        color_range = [0.0, 1.0]
+    else:
+        max_val = df[col].max() if not df[col].empty else 1.0
+        color_range = [0.0, max_val if max_val > 0 else 1.0]
 
     fig = px.choropleth(
         merged_df,
         geojson=merged_df.geometry,
         locations=merged_df.index, 
         color=col,
+        range_color=color_range,
         color_continuous_scale="Reds",
         labels={col: selected_metric},
         hover_name=merged_df.index 
     )
-    fig.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br>" + selected_metric + ": %{z:,.2f}<extra></extra>"
+
+    # Establish grey map trace for unselected provinces, adding it to the figure
+    grey_trace = go.Choropleth(
+        geojson=provinces.__geo_interface__,
+        locations=provinces['NAME_1'],
+        featureidkey="properties.NAME_1",
+        z=[0]*len(provinces),
+        colorscale=[[0, '#e8e8e8'], [1, '#e8e8e8']],
+        showscale=False,
+        marker_line_color='white',
+        marker_line_width=0.5,
+        hoverinfo='skip',
+        showlegend=False
     )
+    
+    # Add the grey trace to the figure 
+    fig.add_trace(grey_trace)
+    
+    # Reorder the traces so the grey map is at index 0 (the bottom layer)
+    # fig.data is now (main_trace, grey_trace), so we swap them
+    fig.data = (fig.data[1], fig.data[0])
+
+    # Now fig.data[1] is the main colored trace, update its hover template
+    fig.data[1].hovertemplate = "<b>%{hovertext}</b><br>" + selected_metric + ": %{z:,.2f}<extra></extra>"
 
     fig.update_geos(
         visible=False,
@@ -104,36 +137,37 @@ def render_top_provinces(df, selected_metric):
     Renders bar chart of top 15 provinces by selected metric
     """
     df = df.groupby(['province', 'region'], as_index=False).sum(numeric_only=True)
+    # Strip dataset defects before min-max evaluations
+    df = df[~df['province'].isin(['without breakdown', 'Special Geographic Areas', 'IIII'])]
 
-    # NOTE: For now, I did not normalize severity to range of 0.0 to 1.0
-    # since min and max values would VARY among year (and region) selections
-    # NOTE: Add 1 to denominator to avoid division by 0 error
-    df['severity'] = df['cost_total'] / (df['affected_families'] + 1)
-    
-    # probable dataset encoding errors found so far
-    df_cleaned = df[~df['province'].isin(['without breakdown', 'Special Geographic Areas',
-                                            'IIII'])]
+    raw_severity = df['cost_total'] / (df['affected_families'] + 1)
+    if not raw_severity.empty and raw_severity.max() != raw_severity.min():
+        df['severity'] = (raw_severity - raw_severity.min()) / (raw_severity.max() - raw_severity.min())
+    else:
+        df['severity'] = 1.0 if not raw_severity.empty and raw_severity.max() > 0 else 0.0
 
     metric_idx = metric_mapping.get(selected_metric, "severity")
 
-    df_top = df_cleaned.sort_values(metric_idx, ascending=True).tail(15)
+    df_top = df.sort_values(metric_idx, ascending=True).tail(15)
 
     fig = px.bar(
         df_top,
         x=metric_idx,
         y='province',
         orientation='h',
-        text_auto='.2s',
+        text_auto='.2f',
         labels={metric_idx: selected_metric, "province": ""},
         template="plotly_white",
         color_discrete_sequence=["#0065fb"]
     )
 
+    dynamic_height = max(150, 100 + len(df_top) * 35)
+
     fig.update_layout(
         bargap=0.1, 
         xaxis=dict(fixedrange=True),
         yaxis=dict(fixedrange=True),
-        height=600,
+        height=dynamic_height,
         margin=dict(l=10, r=20, t=50, b=10),
         hovermode="closest"
     )

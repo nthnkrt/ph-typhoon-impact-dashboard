@@ -36,7 +36,17 @@ with st.sidebar:
                "Region IV-A", "Region IV-B", "Region V", "Region VI", "Region VII", 
                "Region VIII", "Region IX", "Region X", "Region XI", "Region XII", 
                "Region XIII", "BARMM"]
-    selected_region = st.selectbox("Filter by Region", regions, index=0)
+    selected_region_ui = st.selectbox("Filter by Region", regions, index=0)
+    
+    region_mapping = {
+        "All Regions": "All Regions",
+        "NCR": "NCR", "CAR": "CAR", "Region I": "I", "Region II": "II",
+        "Region III": "III", "Region IV-A": "CALABARZON", "Region IV-B": "MIMAROPA",
+        "Region V": "V", "Region VI": "VI", "Region VII": "VII", "Region VIII": "VIII",
+        "Region IX": "IX", "Region X": "X", "Region XI": "XI", "Region XII": "XII",
+        "Region XIII": "CARAGA", "BARMM": "BARMM"
+    }
+    selected_region = region_mapping.get(selected_region_ui, selected_region_ui)
 
     # Primary Metric Selector
     st.subheader("Primary Metric")

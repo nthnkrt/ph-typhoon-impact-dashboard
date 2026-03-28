@@ -23,8 +23,18 @@ def load_data() -> pd.DataFrame:
     file_path = "final_dashboard_data.csv"
     if os.path.exists(file_path):
         df = pd.read_csv(file_path, engine="python")
+        
+        # Standardize province names to match the Map's shapefile geometry precisely
+        if 'province' in df.columns:
+            df['province'] = df['province'].replace({'Metro Manila': 'Metropolitan Manila'})
+            
         if 'dmg_house_totally' in df.columns and 'dmg_house_partial' in df.columns:
             df['damaged_houses'] = df['dmg_house_totally'] + df['dmg_house_partial']
+        
+        # Calculate casualties globally
+        if all(col in df.columns for col in ['dead', 'injured/ill', 'missing']):
+            df['casualties'] = df['dead'] + df['injured/ill'] + df['missing']
+            
         return df
 
     return pd.DataFrame()

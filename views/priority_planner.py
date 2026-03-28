@@ -62,4 +62,13 @@ def render_priority_planner(df, selected_years, selected_region):
         - Administer regular drills in flood-prone areas or damage zones.  
         - Conduct annual inspections of evacuation centers.
         - Review disaster contingency plans. 
+
+        **Tier 4 (Low Priority): Score 0.21 - 0.40**
+        - Monitor the cleanliness of drainage and flood-related structures.
+        - Continue disaster literacy campaigns. 
+        
+        **Tier 5 (Lowest Priority): Score 0.00 - 0.20**
+        - Maintain periodic data updates to ensure the severity score remains stable.
+        
+        *(Note: DPWH should prioritize allocating its budget to Tier 1 and 2 regions)*
         """)
