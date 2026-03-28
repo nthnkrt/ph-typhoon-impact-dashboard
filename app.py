@@ -1,6 +1,7 @@
 import streamlit as st
 from utils.styles import apply_custom_css
-from utils.data_loader import load_data
+from utils.data_loader import load_data, load_dpwh_data
+from utils.reports import generate_global_pdf_report
 
 st.set_page_config(
     page_title="Typhoon Impact Dashboard (2020-2024)",
@@ -57,8 +58,47 @@ with st.sidebar:
     
     # Export Capabilities
     st.subheader("Export & Reports")
-    st.button("Download Current CSV Data", use_container_width=True)
-    st.button("Generate PDF Summary Report", use_container_width=True)
+    
+    # 1. Filter the dataset based on current sidebar limits
+    mask = (df['year'] >= selected_years[0]) & (df['year'] <= selected_years[1])
+    global_df = df[mask].copy()
+    if selected_region != "All Regions":
+        global_df = global_df[global_df['region'] == selected_region]
+        
+    # 2. Extract DPWH Rank context dynamically
+    dpwh_context = ""
+    if selected_region != "All Regions":
+        dpwh_df = load_dpwh_data()
+        if not dpwh_df.empty:
+            rank_cols = [f"Rank_{y}" for y in range(selected_years[0], selected_years[1]+1) if f"Rank_{y}" in dpwh_df.columns]
+            if not rank_cols:
+                rank_cols = [col for col in dpwh_df.columns if col.startswith('Rank_')] 
+            avg_rank = dpwh_df[dpwh_df['Region'] == selected_region][rank_cols].mean(axis=1)
+            if not avg_rank.empty and not pd.isna(avg_rank.iloc[0]):
+                dpwh_context = f"DPWH Average Budget Rank: {avg_rank.iloc[0]:.1f}"
+
+    # 3. CSV Dataset Downloader 
+    csv_bytes = global_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Download Current CSV Data",
+        data=csv_bytes,
+        file_name='executive_typhoon_data.csv',
+        mime='text/csv',
+        use_container_width=True
+    )
+    
+    # 4. Executive PDF Generator Button
+    try:
+        pdf_bytes = generate_global_pdf_report(global_df, selected_region, selected_years, dpwh_context)
+        st.download_button(
+            label="Generate PDF Summary Report",
+            data=pdf_bytes,
+            file_name="Executive_Summary_Report.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
+    except Exception as e:
+        st.error(f"Failed to compile PDF: {e}")
     
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.caption("Data sources: DOST-PAGASA & PSA")
