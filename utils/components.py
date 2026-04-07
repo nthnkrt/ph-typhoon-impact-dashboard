@@ -40,15 +40,16 @@ def load_map_polygons():
     provinces['geometry'] = provinces.geometry.simplify(tolerance=0.01, preserve_topology=True)
     return provinces
 
-# TODO: Clean up dataset errors
-# TODO: Handle NCR
-# TODO: Define casualties
+
 def render_choropleth_map(df, selected_metric, enable_click=True):
     """
     Renders the choropleth map.
     """
     provinces = load_map_polygons()
-    
+    provinces = provinces.replace("Compostela Valley", "Davao de Oro") # quick fixes but ok
+    provinces = provinces.replace("North Cotabato", "Cotabato")
+    provinces = provinces.replace("Tawi-Tawi", "Tawi-tawi")
+
     df = df.groupby(['province', 'region'], as_index=False).sum(numeric_only=True)
     df = df[~df['province'].isin(['without breakdown', 'Special Geographic Areas', 'IIII'])]
     
