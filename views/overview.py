@@ -42,15 +42,18 @@ def render_overview(df, selected_years, selected_region, selected_metric):
     with col_map:
         st.subheader("Geospatial Risk Mapping")
         st.caption("Choropleth map of the Philippines showing provinces colored by the selected metric.")
-        
+
+
         map_event = render_choropleth_map(filtered_df, selected_metric)
         if map_event and map_event.get("selection", {}).get("points"):
             selected_prov = map_event["selection"]["points"][0].get("location")
+            
             if selected_prov and selected_prov in df['province'].values:
-                st.session_state.nav_radio_target = "Province Deep Dive"
-                st.session_state.dd_province = selected_prov
-                st.rerun()
-
+                if st.session_state.get("last_map_click") != selected_prov:
+                    st.session_state["last_map_click"] = selected_prov
+                    st.session_state.nav_radio_target = "Province Deep Dive"
+                    st.session_state.dd_province = selected_prov
+                    st.rerun()
     with col_chart:
         st.subheader(f"Top 15 Provinces by {selected_metric}")
         st.caption("Horizontal bar chart ranking the top 15 most impacted provinces.")

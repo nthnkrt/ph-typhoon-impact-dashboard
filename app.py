@@ -115,21 +115,36 @@ st.markdown("""
 """)
 st.write("") # Spacer
 
-# Navigation
+# Navigation Sync with Browser History (Back/Forward buttons)
+valid_tabs = ["Overview Dashboard", "Province Deep Dive", "Priority Planner", "Trend Analyzer", "Recommendations & Methodology"]
+
+# 1. Programmatic Navigation (e.g. Map Click routing to Deep Dive)
 if 'nav_radio_target' in st.session_state:
     st.session_state.nav_radio = st.session_state.nav_radio_target
+    st.query_params["tab"] = st.session_state.nav_radio_target
     del st.session_state.nav_radio_target
 
-if 'nav_radio' not in st.session_state or st.session_state.nav_radio is None:
+# 2. Browser Back/Forward (URL dictates state if it changed)
+url_tab = st.query_params.get("tab")
+if url_tab in valid_tabs:
+    st.session_state.nav_radio = url_tab
+elif 'nav_radio' not in st.session_state or st.session_state.nav_radio is None:
     st.session_state.nav_radio = "Overview Dashboard"
+    st.query_params["tab"] = "Overview Dashboard"
+
+# 3. User interaction callback: Updates URL instantly before script reruns
+def update_url():
+    if st.session_state.nav_radio:
+        st.query_params["tab"] = st.session_state.nav_radio
 
 # Use st.pills for a modern, minimalist, and clean navigation bar
 selected_tab = st.pills(
     "Navigation", 
-    ["Overview Dashboard", "Province Deep Dive", "Priority Planner", "Trend Analyzer", "Recommendations & Methodology"],
+    valid_tabs,
     selection_mode="single",
     label_visibility="collapsed",
-    key="nav_radio"
+    key="nav_radio",
+    on_change=update_url
 )
 
 if selected_tab is None:

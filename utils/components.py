@@ -32,15 +32,20 @@ def render_chart_placeholder(height: int, text: str):
 @st.cache_data
 def load_map_polygons():
     provinces = gpd.GeoDataFrame.from_file(os.path.join("data", "gadm41_PHL_shp", "gadm41_PHL_1.shp"))
+    # Modernize shapefile names to match current provincial names
+    provinces['NAME_1'] = provinces['NAME_1'].replace({
+        'Compostela Valley': 'Davao de Oro',
+        'North Cotabato': 'Cotabato'
+    })
     provinces['geometry'] = provinces.geometry.simplify(tolerance=0.01, preserve_topology=True)
     return provinces
 
 # TODO: Clean up dataset errors
 # TODO: Handle NCR
 # TODO: Define casualties
-def render_choropleth_map(df, selected_metric):
+def render_choropleth_map(df, selected_metric, enable_click=True):
     """
-    Renders choropleth map
+    Renders the choropleth map.
     """
     provinces = load_map_polygons()
     
@@ -115,6 +120,7 @@ def render_choropleth_map(df, selected_metric):
         height=850,
         margin={"r":0,"t":0,"l":0,"b":0},
         dragmode="pan",
+        uirevision="constant",
         modebar_remove=['autoscale', 'select', 'lasso2d'],
         geo=dict(bgcolor='#b2e2e1'),
         coloraxis_colorbar=dict(
@@ -126,8 +132,11 @@ def render_choropleth_map(df, selected_metric):
         )
     )
 
-    # Allow click selection for navigation
-    event = st.plotly_chart(fig, use_container_width=True, on_select="rerun", selection_mode=("points",))
+    # Render the chart and reinstate strictly Point Selection listeners for navigation
+    if enable_click:
+        event = st.plotly_chart(fig, use_container_width=True, on_select="rerun", selection_mode=("points",), key="main_choropleth_map")
+    else:
+        event = st.plotly_chart(fig, use_container_width=True, key="main_choropleth_map")
     return event
 
 # TODO: CLean up dataset errors
