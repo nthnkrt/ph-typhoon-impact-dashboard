@@ -48,7 +48,6 @@ def render_choropleth_map(df, selected_metric, enable_click=True):
     provinces = load_map_polygons()
     provinces = provinces.replace("Compostela Valley", "Davao de Oro") # quick fixes but ok
     provinces = provinces.replace("North Cotabato", "Cotabato")
-    provinces = provinces.replace("Tawi-Tawi", "Tawi-tawi")
 
     df = df.groupby(['province', 'region'], as_index=False).sum(numeric_only=True)
     df = df[~df['province'].isin(['without breakdown', 'Special Geographic Areas', 'IIII'])]
