@@ -61,4 +61,4 @@ def load_dpwh_data() -> pd.DataFrame:
         df['Region'] = df['Region'].str.strip().str.upper().map(region_map).fillna(df['Region'])
         
         return df
-    return pd.DataFrame()
+    return pd.DataFrame()
