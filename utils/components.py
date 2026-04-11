@@ -59,6 +59,32 @@ def render_choropleth_map(df, selected_metric, enable_click=True):
     else:
         df['severity'] = 1.0 if not raw_severity.empty and raw_severity.max() > 0 else 0.0
         
+    rec_map = {
+        1: "<br>Retrofit centers and bridges,"
+           "<br>Train officials and inform citizens,"
+           "<br>Ensure LGU manpower and equipment,"
+           "<br>Actual flood control implementation",
+        2: "<br>Water-related disaster plans,"
+           "<br>Allocate budget to clear drainages,"
+           "<br>Increase shelters",
+        3: "<br>Regular drills in flood-prone areas,"
+           "<br>Annual evac center inspections,"
+           "<br>Review contingency plans",
+        4: "<br>Monitor drainage and flood structures,"
+           "<br>Continue disaster literacy campaigns",
+        5: "<br>Maintain data updates"
+    }
+    
+    def assign_tier(score):
+        if score >= 0.81: return 1
+        elif score >= 0.61: return 2
+        elif score >= 0.41: return 3
+        elif score >= 0.21: return 4
+        else: return 5
+
+    df['tier'] = df['severity'].apply(assign_tier)
+    df['action'] = df['tier'].map(rec_map)
+
     merged_df = pd.merge(provinces, df, left_on='NAME_1', right_on='province', how='left')
     merged_df = merged_df.set_index('NAME_1')
 
@@ -78,8 +104,12 @@ def render_choropleth_map(df, selected_metric, enable_click=True):
         color=col,
         range_color=color_range,
         color_continuous_scale="Reds",
-        labels={col: selected_metric},
-        hover_name=merged_df.index 
+        labels={col: selected_metric, 'tier': 'Priority Tier', 'action': 'Recommended Action'},
+        hover_name=merged_df.index,
+        hover_data={
+            'tier': True,
+            'action': True
+        }
     )
 
     # Establish grey map trace for unselected provinces, adding it to the figure
@@ -104,7 +134,12 @@ def render_choropleth_map(df, selected_metric, enable_click=True):
     fig.data = (fig.data[1], fig.data[0])
 
     # Now fig.data[1] is the main colored trace, update its hover template
-    fig.data[1].hovertemplate = "<b>%{hovertext}</b><br>" + selected_metric + ": %{z:,.2f}<extra></extra>"
+    fig.data[1].hovertemplate = (
+        "<b>%{hovertext}</b><br>" +
+        f"{selected_metric}: " + "%{z:,.2f}<br>" +
+        "Priority Tier: %{customdata[0]}<br>" +
+        "Actions: %{customdata[1]}<extra></extra>"
+    )
 
     fig.update_geos(
         visible=False,
@@ -139,8 +174,6 @@ def render_choropleth_map(df, selected_metric, enable_click=True):
         event = st.plotly_chart(fig, use_container_width=True, key="main_choropleth_map")
     return event
 
-# TODO: CLean up dataset errors
-# TODO: Define casualties
 def render_top_provinces(df, selected_metric):
     """
     Renders bar chart of top 15 provinces by selected metric
@@ -164,10 +197,19 @@ def render_top_provinces(df, selected_metric):
         x=metric_idx,
         y='province',
         orientation='h',
-        text_auto='.2f',
-        labels={metric_idx: selected_metric, "province": ""},
+        text_auto=',.2f',
+        hover_data={
+            'province': False,
+            metric_idx: ':.4f'
+        },
+        labels={metric_idx: selected_metric},
         template="plotly_white",
         color_discrete_sequence=["#0065fb"]
+    )
+
+    fig.update_traces(
+        textangle=0, 
+        cliponaxis=False
     )
 
     dynamic_height = max(150, 100 + len(df_top) * 35)
