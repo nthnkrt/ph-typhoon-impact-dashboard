@@ -272,7 +272,6 @@ def render_time_plot(df, province, metric):
 
     st.plotly_chart(fig, use_container_width=True)
 
-# TODO: CLean up dataset errors
 def render_pie_chart(df, province):
     df = df[(df['province'] == province) & (df['year'] >= 2021)]
 
@@ -305,6 +304,12 @@ def render_pie_chart(df, province):
     if pie_df.empty:
         st.warning("No damage costs for this province.")
         return
+    
+    total_val = pie_df['Value'].sum()
+    pie_df['Category'] = pie_df.apply(
+        lambda x: f"{x['Category']} ({(x['Value'] / total_val * 100):.1f}%)", 
+        axis=1
+    )
 
     fig = px.pie(
         pie_df,
